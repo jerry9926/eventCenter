@@ -11,7 +11,7 @@ class EventCenter {
     getEventCallback() {
         for (var key in this.eventCallback) {
             console.info("---- Event name", n)
-            if (this.eventCallback[key] && typeof this.eventCallback[key] "object") {
+            if (this.eventCallback[key] && typeof this.eventCallback[key] === "object") {
                 for (var key in this.eventCallback[key]) {
                     console.info("---- Event id", key)
                 }
@@ -124,4 +124,4 @@ function getInstance() {
     return instance;
 }
 
-exports default getInstance;
+export default getInstance

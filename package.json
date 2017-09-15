@@ -1,0 +1,16 @@
+{
+  "name": "eventCenter",
+  "version": "1.0.0",
+  "description": "event-center",
+  "main": "index.js",
+  "repository": "https://github.com/jerry9926/eventCenter.git",
+  "author": "kulerhuang <kulerhuang@local.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0"
+  }
+}
