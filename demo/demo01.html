@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>demo</title>
+    <script src="../dist/eventCenter.js"></script>
+</head>
+<body>
+    <div class="header" id="header">
+        <p>hello, <a href="javascrip:;" onclick="login()">login</a></p>
+    </div>
+    <div class="content">
+        <h1 id="title"></h1>
+        <button onclick="login()">login</button>
+    </div>
+    <script>
+        var eventCenter = new EventCenter();
+        function login() {
+            eventCenter.emitEvent('login', {
+                username: 'Peter'
+            });
+            eventCenter.removeEventListener('login');
+        }
+        eventCenter.addEventListener('login', 'header', function (data) {
+            document.getElementById('header').innerHTML = 'hello, ' + data.username;
+        });
+        eventCenter.addEventListener('login', 'content', function (data) {
+            document.getElementById('title').innerHTML = 'welcome, ' + data.username;
+        });
+    </script>
+</body>
+</html>

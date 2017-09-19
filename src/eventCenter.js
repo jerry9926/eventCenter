@@ -2,22 +2,24 @@ let instance = null;
 
 class EventCenter {
     constructor() {
-        this.throttleTimer = null,
-        this.eventCallback = {},
-        this.eventListener = {},
-        instance = this
+        if (!instance) {
+            this.throttleTimer = null;
+            this.eventCallback = {};
+            this.eventListener = {};
+            instance = this;
+        }
+        return instance;
     }
 
     getEventCallback() {
         for (var key in this.eventCallback) {
-            console.info("---- Event name", n)
+            console.info("---- Event name", key);
             if (this.eventCallback[key] && typeof this.eventCallback[key] === "object") {
                 for (var key in this.eventCallback[key]) {
                     console.info("---- Event id", key)
                 }
             }
         }
-                    
     }
 
     throttleWrap(cb) {
@@ -30,19 +32,38 @@ class EventCenter {
         }
     }
 
+    // 根据id触发事件
+    emitEvent(type, data) {
+        if (this.eventListener[type]) {
+            this.eventListener[type](data);
+        }
+    }
+
+    // 触发事件
+    emitEventById(type, id, data) {
+        if (this.eventCallback[type]) {
+            if (this.eventCallback[type][id]) {
+                this.eventCallback[type][id](data);
+            } else {
+                console.warn("eventCenter Error: emitEventById eventCallback[" + type + "][" + id + "] is not exist")
+            }
+        } else {
+            console.warn("eventCenter Error: emitEventById eventCallback[" + type + "] is not exist")
+        }
+    }
+
     addResizeEvent(id ,cb) {
-        const that = this;
         this.addEventListener('resize', id, cb);
 
         let resizeFun = () => {
-            that.throttleWrap(() => {
-                for (const key in that.eventCallback['resize']) {
-                    if (that.eventCallback['resize'][key]) {
-                        that.eventCallback['resize'][key]();
+            this.throttleWrap(() => {
+                for (const key in this.eventCallback['resize']) {
+                    if (this.eventCallback['resize'][key]) {
+                        this.eventCallback['resize'][key]();
                     }
                 }
-            })
-        }
+            });
+        };
 
         if (Object.keys(this.eventCallback['resize']).length > 0) {
             if (this.eventListener['resize']) {
@@ -53,6 +74,26 @@ class EventCenter {
         }
     }
 
+    // 添加事件
+    addEventListener(type, id, cb) {
+        if (this.eventCallback[type] === undefined) {
+            this.eventCallback[type] = {};
+        }
+        this.eventCallback[type][id] = cb;
+
+        let eventListenerFun = (data) => {
+            for (const key in this.eventCallback[type]) {
+                if (this.eventCallback[type][key]) {
+                    this.eventCallback[type][key](data);
+                }
+            }
+        };
+
+        if (Object.keys(this.eventCallback[type]).length > 0) {
+            this.eventListener[type] = eventListenerFun;
+        }
+    }
+
     removeResizeEvent(id) {
         if (this.eventCallback['resize'] && this.eventCallback['resize'][id]) {
             delete this.eventCallback['resize'][id];
@@ -60,33 +101,6 @@ class EventCenter {
             if (Object.keys(this.eventCallback['resize']).length === 0) {
                 this.removeEventListener('resize');
             }
-        }
-    }
-
-    addEventListener(type, id, cb) {
-        if (this.eventCallback[type] === undefined) {
-            this.this.eventCallback[type] = {};
-        }
-        this.eventCallback[type][id] = cb;
-    }
-
-    emitEvent(type, data) {
-        for (const key in this.eventCallback[type]) {
-            if (this.eventCallback[type][key]) {
-                this.eventCallback[type][key](data);
-            }
-        }
-    }
-
-    emitEventById(type, id, data) {
-        if (this.eventCallback[type]) {
-            if (this.eventCallback[type][id]) {
-                this.eventCallback[type][id](data);
-            } else {
-                console.warn("eventCenter Error: emitEventById eventCallback[" + type + "][" + id + "] is not exist")
-            }
-        } else {
-            console.warn("eventCenter Error: emitEventById eventCallback[" + type + "] is not exist")
         }
     }
 
@@ -108,6 +122,7 @@ class EventCenter {
                 window.removeEventListener('resize', this.eventListener['resize'], true);
             }
             delete this.eventCallback[type];
+            delete this.eventListener[type]
         }
     }
 
@@ -115,13 +130,3 @@ class EventCenter {
         window.removeEventListener('resize', this.eventListener['resize'], true);
     }
 }
-
-function getInstance() {
-    if (!instance) {
-        instance = new EventCenter();
-    }
-
-    return instance;
-}
-
-export default getInstance
