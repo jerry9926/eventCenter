@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>emit, add, remove event - demo</title>
+    <script src="../dist/eventCenter.js"></script>
+</head>
+<body>
+    <h1>demo for emit event, add event, remove event</h1>
+    <div class="header" id="header">
+        <button onclick="emit()">emit</button>
+        <button onclick="addOne()">add one listener</button>
+        <button onclick="addTwo()">add two listener</button>
+        <button onclick="removeOne()">remove one listener</button>
+        <button onclick="removeTwo()">remove two listener</button>
+        <button onclick="removeAll()">remove all listener</button>
+    </div>
+    <div class="content" id="content">
+
+    </div>
+    <script>
+        var eventCenter = new EventCenter();
+        function emit() {
+            eventCenter.emitEvent('test', {
+                namespace: 'test'
+            });
+            eventCenter.removeEventListener('test');
+        }
+        function addOne() {
+            var logStr = 'Event namespace: test, listener: one is listening';
+            log(logStr);
+            eventCenter.addEventListener('test', 'one', function (data) {
+                var logStr = 'Event namespace: ' + data.namespace + ', listener: one is called';
+                log(logStr);
+            });
+        }
+        function addTwo() {
+            var logStr = 'Event namespace: test, listener: two is listening';
+            log(logStr);
+            eventCenter.addEventListener('test', 'two', function (data) {
+                var logStr = 'Event namespace:' + data.namespace + ', listener: two is called';
+                log(logStr);
+            });
+        }
+        function removeOne() {
+            var logStr = 'Event namespace: test, listener: one is removed';
+            log(logStr);
+            eventCenter.removeEventListener('test', 'one');
+        }
+        function removeTwo() {
+            var logStr = 'Event namespace: test, listener: two is removed';
+            log(logStr);
+            eventCenter.removeEventListener('test', 'two');
+        }
+        function removeAll() {
+            var logStr = 'Event namespace: test, all listener is removed';
+            log(logStr);
+            eventCenter.removeEvent('test');
+        }
+        function log(str) {
+            var p = document.createElement('p');
+            p.innerHTML = str;
+            document.getElementById('content').appendChild(p);
+        }
+    </script>
+</body>
+</html>

@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>demo</title>
+    <title>base - demo</title>
     <script src="../dist/eventCenter.js"></script>
 </head>
 <body>
+    <h1>base demo</h1>
     <div class="header" id="header">
         <p>hello, <a href="javascrip:;" onclick="login()">login</a></p>
     </div>
@@ -19,7 +20,7 @@
             eventCenter.emitEvent('login', {
                 username: 'Peter'
             });
-            eventCenter.removeEventListener('login');
+            eventCenter.removeEvent('login');
         }
         eventCenter.addEventListener('login', 'header', function (data) {
             document.getElementById('header').innerHTML = 'hello, ' + data.username;

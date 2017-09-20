@@ -4,7 +4,7 @@
   "description": "event-center",
   "main": "index.js",
   "repository": "https://github.com/jerry9926/eventCenter.git",
-  "author": "kulerhuang <kulerhuang@local.com>",
+  "author": "kulerhuang <jerry9926@163.com>",
   "license": "MIT",
   "private": false,
   "dependencies": {

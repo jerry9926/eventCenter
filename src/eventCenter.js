@@ -1,19 +1,19 @@
-let instance = null;
+let ecInstance = null;
 
 class EventCenter {
     constructor() {
-        if (!instance) {
+        if (!ecInstance) {
             this.throttleTimer = null;
             this.eventCallback = {};
             this.eventListener = {};
-            instance = this;
+            ecInstance = this;
         }
-        return instance;
+        return ecInstance;
     }
 
     getEventCallback() {
         for (var key in this.eventCallback) {
-            console.info("---- Event name", key);
+            console.info("---- Event namespace", key);
             if (this.eventCallback[key] && typeof this.eventCallback[key] === "object") {
                 for (var key in this.eventCallback[key]) {
                     console.info("---- Event id", key)
@@ -33,100 +33,106 @@ class EventCenter {
     }
 
     // 根据id触发事件
-    emitEvent(type, data) {
-        if (this.eventListener[type]) {
-            this.eventListener[type](data);
+    emitEvent(namespace, data) {
+        if (this.eventListener[namespace]) {
+            this.eventListener[namespace](data);
         }
     }
 
     // 触发事件
-    emitEventById(type, id, data) {
-        if (this.eventCallback[type]) {
-            if (this.eventCallback[type][id]) {
-                this.eventCallback[type][id](data);
+    emitEventById(namespace, id, data) {
+        if (this.eventCallback[namespace]) {
+            if (this.eventCallback[namespace][id]) {
+                this.eventCallback[namespace][id](data);
             } else {
-                console.warn("eventCenter Error: emitEventById eventCallback[" + type + "][" + id + "] is not exist")
+                console.warn("eventCenter Error: emitEventById eventCallback[" + namespace + "][" + id + "] is not exist")
             }
         } else {
-            console.warn("eventCenter Error: emitEventById eventCallback[" + type + "] is not exist")
+            console.warn("eventCenter Error: emitEventById eventCallback[" + namespace + "] is not exist")
         }
     }
 
-    addResizeEvent(id ,cb) {
-        this.addEventListener('resize', id, cb);
+    // 添加事件
+    addEventListener(namespace, id, cb) {
+        if (this.eventCallback[namespace] === undefined) {
+            this.eventCallback[namespace] = {};
+        }
+        this.eventCallback[namespace][id] = cb;
+
+        let eventListenerFun = (data) => {
+            for (const key in this.eventCallback[namespace]) {
+                if (this.eventCallback[namespace][key]) {
+                    this.eventCallback[namespace][key](data);
+                }
+            }
+        };
+
+        if (Object.keys(this.eventCallback[namespace]).length > 0) {
+            this.eventListener[namespace] = eventListenerFun;
+        }
+    }
+
+    // 根据id移除事件监听器
+    removeEventListener(namespace, id) {
+        if (this.eventCallback[namespace] && this.eventCallback[namespace][id]) {
+            delete this.eventCallback[namespace][id];
+
+            if (Object.keys(this.eventCallback[namespace]).length === 0) {
+                this.removeEvent(namespace);
+            }
+        }
+    }
+
+    // 移除事件（移除该事件所有事件监听器）
+    removeEvent(namespace) {
+        if (this.eventListener[namespace]) {
+            if (namespace === 'resize') {
+                window.removeEventListener('resize', this.eventListener['resize'], true);
+            }
+            delete this.eventCallback[namespace];
+            delete this.eventListener[namespace]
+        }
+    }
+
+    addResizeEventLister(id ,cb) {
+        this.addEventListener(EventCenter.WINDOW_RESIZE, id, cb);
 
         let resizeFun = () => {
             this.throttleWrap(() => {
-                for (const key in this.eventCallback['resize']) {
-                    if (this.eventCallback['resize'][key]) {
-                        this.eventCallback['resize'][key]();
+                for (const key in this.eventCallback[EventCenter.WINDOW_RESIZE]) {
+                    if (this.eventCallback[EventCenter.WINDOW_RESIZE][key]) {
+                        this.eventCallback[EventCenter.WINDOW_RESIZE][key]();
                     }
                 }
             });
         };
 
-        if (Object.keys(this.eventCallback['resize']).length > 0) {
-            if (this.eventListener['resize']) {
-                this.resetResizeEventListener('resize');
+        if (Object.keys(this.eventCallback[EventCenter.WINDOW_RESIZE]).length > 0) {
+            if (this.eventListener[EventCenter.WINDOW_RESIZE]) {
+                this.resetResizeEventListener(EventCenter.WINDOW_RESIZE);
             }
-            this.eventListener['resize'] = resizeFun;
-            window.addEventListener('resize', this.eventListener['resize'], true);
+            this.eventListener[EventCenter.WINDOW_RESIZE] = resizeFun;
+            window.addEventListener('resize', this.eventListener[EventCenter.WINDOW_RESIZE], true);
         }
     }
 
-    // 添加事件
-    addEventListener(type, id, cb) {
-        if (this.eventCallback[type] === undefined) {
-            this.eventCallback[type] = {};
-        }
-        this.eventCallback[type][id] = cb;
+    removeResizeEventListener(id) {
+        if (this.eventCallback[EventCenter.WINDOW_RESIZE] && this.eventCallback[EventCenter.WINDOW_RESIZE][id]) {
+            delete this.eventCallback[EventCenter.WINDOW_RESIZE][id];
 
-        let eventListenerFun = (data) => {
-            for (const key in this.eventCallback[type]) {
-                if (this.eventCallback[type][key]) {
-                    this.eventCallback[type][key](data);
-                }
-            }
-        };
-
-        if (Object.keys(this.eventCallback[type]).length > 0) {
-            this.eventListener[type] = eventListenerFun;
-        }
-    }
-
-    removeResizeEvent(id) {
-        if (this.eventCallback['resize'] && this.eventCallback['resize'][id]) {
-            delete this.eventCallback['resize'][id];
-
-            if (Object.keys(this.eventCallback['resize']).length === 0) {
-                this.removeEventListener('resize');
+            if (Object.keys(this.eventCallback[EventCenter.WINDOW_RESIZE]).length === 0) {
+                this.removeEvent(EventCenter.WINDOW_RESIZE);
             }
         }
     }
 
-    // 根据id移除事件
-    removeEvent(type, id) {
-        if (this.eventCallback[type] && this.eventCallback[type][id]) {
-            delete this.eventCallback[type][id];
-
-            if (Object.keys(this.eventCallback[type]).length === 0) {
-                this.removeEventListener(type);
-            }
-        }
-    }
-
-    // 移除事件监听器
-    removeEventListener(type) {
-        if (this.eventListener[type]) {
-            if (type === 'resize') {
-                window.removeEventListener('resize', this.eventListener['resize'], true);
-            }
-            delete this.eventCallback[type];
-            delete this.eventListener[type]
-        }
+    removeResizeEvent() {
+        this.removeEvent(EventCenter.WINDOW_RESIZE);
     }
 
     resetResizeEventListener() {
-        window.removeEventListener('resize', this.eventListener['resize'], true);
+        window.removeEventListener('resize', this.eventListener[EventCenter.WINDOW_RESIZE], true);
     }
 }
+
+EventCenter.WINDOW_RESIZE = 'WINDOW_RESIZE';

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>resize event - demo</title>
+    <script src="../dist/eventCenter.js"></script>
+</head>
+<body>
+    <h1>demo for emit resize event, add resize event, remove resize event</h1>
+    <div class="header" id="header">
+        <p>resize window to emit event</p>
+        <button onclick="addOne()">add one listener</button>
+        <button onclick="addTwo()">add two listener</button>
+        <button onclick="removeOne()">remove one listener</button>
+        <button onclick="removeTwo()">remove two listener</button>
+        <button onclick="removeAll()">remove all listener</button>
+    </div>
+    <div class="content" id="content">
+
+    </div>
+    <script>
+        var eventCenter = new EventCenter();
+        function addOne() {
+            var logStr = 'Resize event, listener: one is listening';
+            log(logStr);
+            eventCenter.addResizeEventLister('one', function (data) {
+                var logStr = 'Resize event, listener: one is called';
+                log(logStr);
+            });
+        }
+        function addTwo() {
+            var logStr = 'Resize event, listener: two is listening';
+            log(logStr);
+            eventCenter.addResizeEventLister('two', function (data) {
+                var logStr = 'Resize event, listener: two is called';
+                log(logStr);
+            });
+        }
+        function removeOne() {
+            var logStr = 'Resize event, listener: one is removed';
+            log(logStr);
+            eventCenter.removeResizeEventListener('one');
+        }
+        function removeTwo() {
+            var logStr = 'Resize event, listener: two is removed';
+            log(logStr);
+            eventCenter.removeResizeEventListener('two');
+        }
+        function removeAll() {
+            var logStr = 'Resize event, all listener is removed';
+            log(logStr);
+            eventCenter.removeResizeEvent();
+        }
+        function log(str) {
+            var p = document.createElement('p');
+            p.innerHTML = str;
+            document.getElementById('content').appendChild(p);
+        }
+    </script>
+</body>
+</html>
