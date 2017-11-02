@@ -32,7 +32,7 @@ class EventCenter {
         }
     }
 
-    // 根据id触发事件
+    // 根据namespace触发事件
     emitEvent(namespace, data) {
         if (this.eventListener[namespace]) {
             this.eventListener[namespace](data);
@@ -136,3 +136,5 @@ class EventCenter {
 }
 
 EventCenter.WINDOW_RESIZE = 'WINDOW_RESIZE';
+
+export default EventCenter;
